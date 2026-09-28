@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#1a1a1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Food Storage">
+  <title>Food Storage</title>
+  <style>
+    :root {
+      --text: #1a1a1a;
+      --bg: #fafafa;
+      --border: #e5e5e5;
+      --safe: #4a934a;
+      --warning: #d97757;
+      --danger: #c5333f;
+      --muted: #666;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 16px;
+      line-height: 1.5;
+      padding-top: max(16px, env(safe-area-inset-top));
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0 0 24px 0;
+      letter-spacing: -0.3px;
+    }
+
+    .form-section {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    input {
+      font-family: inherit;
+      font-size: 16px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: white;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--text);
+      box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.1);
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 500;
+      padding: 10px 16px;
+      background: var(--text);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+
+    button:active {
+      opacity: 0.9;
+    }
+
+    .notification-prompt {
+      background: #f0f0f0;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .notification-prompt button {
+      background: var(--text);
+      padding: 6px 12px;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    .items-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .item {
+      background: white;
+      border-left: 4px solid;
+      padding: 12px;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border: 1px solid var(--border);
+      border-left-width: 4px;
+    }
+
+    .item.safe {
+      border-left-color: var(--safe);
+    }
+
+    .item.warning {
+      border-left-color: var(--warning);
+    }
+
+    .item.danger {
+      border-left-color: var(--danger);
+    }
+
+    .item-info {
+      flex: 1;
+    }
+
+    .item-name {
+      font-weight: 500;
+      font-size: 15px;
+      margin: 0 0 4px 0;
+    }
+
+    .item-date {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .item-status {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .status-safe {
+      color: var(--safe);
+      background: rgba(74, 147, 74, 0.1);
+    }
+
+    .status-warning {
+      color: var(--warning);
+      background: rgba(217, 119, 87, 0.1);
+    }
+
+    .status-danger {
+      color: var(--danger);
+      background: rgba(197, 51, 63, 0.1);
+    }
+
+    .item-delete {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 4px 8px;
+      font-size: 18px;
+      margin-left: 8px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .controls button {
+      flex: 1;
+      padding: 8px;
+      font-size: 13px;
+    }
+
+    .danger-button {
+      background: var(--danger);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Food Storage</h1>
+
+    <div id="notificationPrompt" class="notification-prompt" style="display: none;">
+      Enable notifications to get expiry warnings.
+      <button onclick="requestNotificationPermission()">Enable</button>
+    </div>
+
+    <div class="form-section">
+      <div class="form-group">
+        <label for="itemName">Item</label>
+        <input type="text" id="itemName" placeholder="e.g., Canned beans">
+      </div>
+      <div class="form-group">
+        <label for="expiryDate">Use by date</label>
+        <input type="date" id="expiryDate">
+      </div>
+      <button onclick="addItem()">Save</button>
+    </div>
+
+    <div id="itemsContainer" class="items-section"></div>
+
+    <div class="controls">
+      <button onclick="clearAllData()" class="danger-button">Clear all</button>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'foodStorage';
+    const WARNING_DAYS = 30;
+
+    // Register service worker for offline functionality
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('data:application/javascript,' + encodeURIComponent(`
+const CACHE_NAME = 'food-storage-v1';
+
+self.addEventListener('install', event => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', event => {
+  self.clients.claim();
+});
+
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    fetch(event.request).catch(() => {
+      return new Response('Offline', { status: 503 });
+    })
+  );
+});
+      `)).catch(() => {});
+    }
+
+    // Check notification permission on load
+    window.addEventListener('load', () => {
+      if ('Notification' in window && Notification.permission === 'default') {
+        document.getElementById('notificationPrompt').style.display = 'block';
+      }
+      renderItems();
+      checkForExpiringSoon();
+    });
+
+    function addItem() {
+      const nameInput = document.getElementById('itemName');
+      const dateInput = document.getElementById('expiryDate');
+
+      if (!nameInput.value.trim() || !dateInput.value) {
+        alert('Please enter item name and date');
+        return;
+      }
+
+      const items = getItems();
+      items.push({
+        id: Date.now(),
+        name: nameInput.value.trim(),
+        expiryDate: dateInput.value,
+        added: new Date().toISOString()
+      });
+
+      setItems(items);
+      nameInput.value = '';
+      dateInput.value = '';
+      renderItems();
+      checkForExpiringSoon();
+    }
+
+    function deleteItem(id) {
+      const items = getItems().filter(item => item.id !== id);
+      setItems(items);
+      renderItems();
+    }
+
+    function getItems() {
+      const data = localStorage.getItem(STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    }
+
+    function setItems(items) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
+
+    function getStatus(expiryDate) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const expiry = new Date(expiryDate);
+      expiry.setHours(0, 0, 0, 0);
+
+      const daysUntil = Math.floor((expiry - today) / (1000 * 60 * 60 * 24));
+
+      if (daysUntil < 0) {
+        return { status: 'danger', label: 'Past use by', days: null };
+      } else if (daysUntil <= WARNING_DAYS) {
+        return { status: 'warning', label: `${daysUntil} days left`, days: daysUntil };
+      } else {
+        return { status: 'safe', label: `${daysUntil} days left`, days: daysUntil };
+      }
+    }
+
+    function formatDate(dateStr) {
+      const date = new Date(dateStr + 'T00:00:00');
+      return date.toLocaleDateString('en-GB', { 
+        day: 'numeric', 
+        month: 'short', 
+        year: 'numeric' 
+      });
+    }
+
+    function renderItems() {
+      const items = getItems();
+      const container = document.getElementById('itemsContainer');
+
+      if (items.length === 0) {
+        container.innerHTML = '<div class="empty-state">No items recorded yet</div>';
+        return;
+      }
+
+      // Sort by expiry date
+      items.sort((a, b) => new Date(a.expiryDate) - new Date(b.expiryDate));
+
+      container.innerHTML = items.map(item => {
+        const { status, label } = getStatus(item.expiryDate);
+        return `
+          <div class="item ${status}">
+            <div class="item-info">
+              <div class="item-name">${escapeHtml(item.name)}</div>
+              <div class="item-date">Use by ${formatDate(item.expiryDate)}</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="item-status status-${status}">${label}</div>
+              <button class="item-delete" onclick="deleteItem(${item.id})">×</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function checkForExpiringSoon() {
+      if (!('Notification' in window) || Notification.permission !== 'granted') {
+        return;
+      }
+
+      const items = getItems();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      items.forEach(item => {
+        const { days } = getStatus(item.expiryDate);
+        
+        if (days !== null && days <= WARNING_DAYS && days >= 0) {
+          const lastNotified = localStorage.getItem(`notified_${item.id}`);
+          const now = Date.now();
+          
+          if (!lastNotified || (now - parseInt(lastNotified)) > 86400000) {
+            new Notification('Food storage expiry', {
+              body: `${item.name} expires in ${days} day${days !== 1 ? 's' : ''}`,
+              tag: `expiry_${item.id}`
+            });
+            localStorage.setItem(`notified_${item.id}`, now.toString());
+          }
+        }
+      });
+    }
+
+    function requestNotificationPermission() {
+      if (!('Notification' in window)) {
+        alert('Notifications not supported on this device');
+        return;
+      }
+
+      Notification.requestPermission().then(permission => {
+        document.getElementById('notificationPrompt').style.display = 'none';
+        if (permission === 'granted') {
+          checkForExpiringSoon();
+        }
+      });
+    }
+
+    function clearAllData() {
+      if (confirm('Delete all items? This cannot be undone.')) {
+        localStorage.removeItem(STORAGE_KEY);
+        renderItems();
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>
