@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#1a1a1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PILESTOCK">
+  <title>PILESTOCK</title>
+  <style>
+    :root {
+      --text: #1a1a1a;
+      --bg: #fafafa;
+      --border: #e5e5e5;
+      --safe: #4a934a;
+      --warning: #d97757;
+      --danger: #c5333f;
+      --muted: #666;
+      --accent: #0066cc;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 16px;
+      line-height: 1.5;
+      padding-top: max(16px, env(safe-area-inset-top));
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0 0 16px 0;
+      letter-spacing: -0.3px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab-button {
+      padding: 10px 16px;
+      background: none;
+      border: none;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+
+    .tab-button.active {
+      color: var(--text);
+      border-bottom-color: var(--text);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .form-section {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    input, select {
+      font-family: inherit;
+      font-size: 16px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: white;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--text);
+      box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.1);
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 500;
+      padding: 10px 16px;
+      background: var(--text);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+
+    button:active {
+      opacity: 0.9;
+    }
+
+    .items-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .item {
+      background: white;
+      border-left: 4px solid;
+      padding: 12px;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border: 1px solid var(--border);
+      border-left-width: 4px;
+    }
+
+    .item.safe {
+      border-left-color: var(--safe);
+    }
+
+    .item.warning {
+      border-left-color: var(--warning);
+    }
+
+    .item.danger {
+      border-left-color: var(--danger);
+    }
+
+    .item-info {
+      flex: 1;
+    }
+
+    .item-name {
+      font-weight: 500;
+      font-size: 15px;
+      margin: 0 0 4px 0;
+    }
+
+    .item-quantity {
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 500;
+      margin: 2px 0;
+    }
+
+    .item-location {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 2px 0;
+    }
+
+    .item-dates {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .item-status {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .status-safe {
+      color: var(--safe);
+      background: rgba(74, 147, 74, 0.1);
+    }
+
+    .status-warning {
+      color: var(--warning);
+      background: rgba(217, 119, 87, 0.1);
+    }
+
+    .status-danger {
+      color: var(--danger);
+      background: rgba(197, 51, 63, 0.1);
+    }
+
+    .item-delete {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 4px 8px;
+      font-size: 18px;
+      margin-left: 8px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .controls button {
+      flex: 1;
+      padding: 8px;
+      font-size: 13px;
+    }
+
+    .danger-button {
+      background: var(--danger);
+    }
+
+    .secondary {
+      background: var(--border);
+      color: var(--text);
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: flex-end;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 12px 12px 0 0;
+      padding: 20px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-content h2 {
+      margin: 0 0 12px 0;
+      font-size: 18px;
+    }
+
+    .modal-content p {
+      margin: 0 0 12px 0;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    textarea {
+      width: 100%;
+      font-family: monospace;
+      font-size: 12px;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      min-height: 120px;
+      resize: vertical;
+      margin-bottom: 16px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .modal-buttons button {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>PILESTOCK</h1>
+
+    <div class="tabs">
+      <button class="tab-button active" onclick="switchTab('everyday')">Everyday</button>
+      <button class="tab-button" onclick="switchTab('stockpile')">Stockpile</button>
+    </div>
+
+    <!-- Everyday Tab -->
+    <div id="everyday" class="tab-content active">
+      <div class="form-section">
+        <div class="form-group">
+          <label for="everydayName">Item</label>
+          <input type="text" id="everydayName" placeholder="e.g., Spinach">
+        </div>
+        <div class="form-group">
+          <label for="everydayCategory">Category</label>
+          <select id="everydayCategory">
+            <option value="veg">Veg</option>
+            <option value="fruit">Fruit</option>
+            <option value="meat">Meat</option>
+            <option value="dairy">Dairy</option>
+            <option value="dry">Dry Goods</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="everydayLocation">Location</label>
+          <select id="everydayLocation">
+            <option value="kitchen-fridge">Kitchen Fridge</option>
+            <option value="downstairs-fridge">Downstairs Fridge</option>
+            <option value="pantry">Pantry</option>
+            <option value="trolley">Food Trolley</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="everydayQuantity">Quantity (optional)</label>
+          <input type="text" id="everydayQuantity" placeholder="e.g., 3 bags">
+        </div>
+        <div class="form-group">
+          <label for="everydayUseBy">Use by date</label>
+          <input type="date" id="everydayUseBy">
+        </div>
+        <button onclick="addEveryday()">Save</button>
+      </div>
+
+      <div id="everydayContainer" class="items-section"></div>
+    </div>
+
+    <!-- Stockpile Tab -->
+    <div id="stockpile" class="tab-content">
+      <div class="form-section">
+        <div class="form-group">
+          <label for="stockpileName">Item</label>
+          <input type="text" id="stockpileName" placeholder="e.g., Canned beans">
+        </div>
+        <div class="form-group">
+          <label for="stockpileCategory">Category</label>
+          <select id="stockpileCategory">
+            <option value="canned">Canned</option>
+            <option value="dry">Dry Goods</option>
+            <option value="oil">Oils & Condiments</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="stockpileLocation">Location</label>
+          <select id="stockpileLocation">
+            <option value="cellar">Cellar</option>
+            <option value="pantry">Pantry</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="stockpileQuantity">Quantity (optional)</label>
+          <input type="text" id="stockpileQuantity" placeholder="e.g., 12 tins">
+        </div>
+        <div class="form-group">
+          <label for="stockpileUseBy">Use by date</label>
+          <input type="date" id="stockpileUseBy">
+        </div>
+        <button onclick="addStockpile()">Save</button>
+      </div>
+
+      <div id="stockpileContainer" class="items-section"></div>
+    </div>
+
+    <div class="controls">
+      <button onclick="exportData()">Export</button>
+      <button onclick="showImportModal()">Import</button>
+      <button onclick="clearAllData()" class="danger-button">Clear all</button>
+    </div>
+  </div>
+
+  <div id="importModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <h2>Import Data</h2>
+      <p>Paste your exported data below:</p>
+      <textarea id="importText" placeholder="Paste exported data here"></textarea>
+      <div class="modal-buttons">
+        <button onclick="importData()">Import</button>
+        <button onclick="closeImportModal()" class="secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'foodTracker';
+    const PERISHABLE_WARNING_HOURS = 48;
+    const STOCKPILE_WARNING_DAYS = 30;
+
+    // Service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('data:application/javascript,' + encodeURIComponent(`
+self.addEventListener('install', e => self.skipWaiting());
+self.addEventListener('activate', e => e.waitUntil(clients.claim()));
+self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => new Response('Offline'))));
+      `)).catch(() => {});
+    }
+
+    window.addEventListener('load', () => {
+      renderAll();
+      checkForExpiring();
+    });
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+      document.getElementById(tab).classList.add('active');
+      document.querySelector(`button[onclick="switchTab('${tab}')"]`).classList.add('active');
+    }
+
+    function addEveryday() {
+      const name = document.getElementById('everydayName').value.trim();
+      const category = document.getElementById('everydayCategory').value;
+      const location = document.getElementById('everydayLocation').value;
+      const quantity = document.getElementById('everydayQuantity').value.trim();
+      const useBy = document.getElementById('everydayUseBy').value;
+
+      if (!name || !useBy) {
+        alert('Please enter item name and use by date');
+        return;
+      }
+
+      const items = getItems();
+      items.push({
+        id: Date.now(),
+        type: 'perishable',
+        name,
+        category,
+        location,
+        quantity: quantity || null,
+        useBy,
+        dateAdded: new Date().toISOString().split('T')[0]
+      });
+
+      setItems(items);
+      document.getElementById('everydayName').value = '';
+      document.getElementById('everydayQuantity').value = '';
+      document.getElementById('everydayUseBy').value = '';
+      renderAll();
+      checkForExpiring();
+    }
+
+    function addStockpile() {
+      const name = document.getElementById('stockpileName').value.trim();
+      const category = document.getElementById('stockpileCategory').value;
+      const location = document.getElementById('stockpileLocation').value;
+      const quantity = document.getElementById('stockpileQuantity').value.trim();
+      const useBy = document.getElementById('stockpileUseBy').value;
+
+      if (!name || !useBy) {
+        alert('Please enter item name and use by date');
+        return;
+      }
+
+      const items = getItems();
+      items.push({
+        id: Date.now(),
+        type: 'stockpile',
+        name,
+        category,
+        location,
+        quantity: quantity || null,
+        useBy
+      });
+
+      setItems(items);
+      document.getElementById('stockpileName').value = '';
+      document.getElementById('stockpileQuantity').value = '';
+      document.getElementById('stockpileUseBy').value = '';
+      renderAll();
+      checkForExpiring();
+    }
+
+    function deleteItem(id) {
+      const items = getItems().filter(item => item.id !== id);
+      setItems(items);
+      renderAll();
+    }
+
+    function getItems() {
+      const data = localStorage.getItem(STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    }
+
+    function setItems(items) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
+
+    function getStatus(useBy, isPerishable) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const expiry = new Date(useBy);
+      expiry.setHours(0, 0, 0, 0);
+
+      const daysUntil = (expiry - today) / (1000 * 60 * 60 * 24);
+
+      if (daysUntil < 0) {
+        return { status: 'danger', label: 'Past use by', daysUntil };
+      }
+
+      if (isPerishable) {
+        const hoursUntil = daysUntil * 24;
+        if (hoursUntil <= PERISHABLE_WARNING_HOURS) {
+          return { status: 'warning', label: `${Math.round(hoursUntil)}h left`, daysUntil };
+        }
+        return { status: 'safe', label: `${Math.round(daysUntil)}d left`, daysUntil };
+      } else {
+        if (daysUntil <= STOCKPILE_WARNING_DAYS) {
+          return { status: 'warning', label: `${Math.round(daysUntil)}d left`, daysUntil };
+        }
+        return { status: 'safe', label: `${Math.round(daysUntil)}d left`, daysUntil };
+      }
+    }
+
+    function formatDate(dateStr) {
+      const date = new Date(dateStr + 'T00:00:00');
+      return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function formatLocation(loc) {
+      const map = {
+        'kitchen-fridge': 'Kitchen Fridge',
+        'downstairs-fridge': 'Downstairs Fridge',
+        'pantry': 'Pantry',
+        'trolley': 'Food Trolley',
+        'cellar': 'Cellar',
+        'other': 'Other'
+      };
+      return map[loc] || loc;
+    }
+
+    function renderAll() {
+      renderEveryday();
+      renderStockpile();
+    }
+
+    function renderEveryday() {
+      const items = getItems().filter(i => i.type === 'perishable');
+      const container = document.getElementById('everydayContainer');
+
+      if (items.length === 0) {
+        container.innerHTML = '<div class="empty-state">No items recorded yet</div>';
+        return;
+      }
+
+      // Sort by date added (FIFO) - oldest first
+      items.sort((a, b) => new Date(a.dateAdded) - new Date(b.dateAdded));
+
+      container.innerHTML = items.map(item => {
+        const { status, label } = getStatus(item.useBy, true);
+        const quantityLine = item.quantity ? `<div class="item-quantity">${escapeHtml(item.quantity)}</div>` : '';
+        return `
+          <div class="item ${status}">
+            <div class="item-info">
+              <div class="item-name">${escapeHtml(item.name)}</div>
+              ${quantityLine}
+              <div class="item-location">${formatLocation(item.location)} • ${item.category}</div>
+              <div class="item-dates">Added ${formatDate(item.dateAdded)} • Use by ${formatDate(item.useBy)}</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="item-status status-${status}">${label}</div>
+              <button class="item-delete" onclick="deleteItem(${item.id})">×</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderStockpile() {
+      const items = getItems().filter(i => i.type === 'stockpile');
+      const container = document.getElementById('stockpileContainer');
+
+      if (items.length === 0) {
+        container.innerHTML = '<div class="empty-state">No items recorded yet</div>';
+        return;
+      }
+
+      // Sort by expiry date - closest first
+      items.sort((a, b) => new Date(a.useBy) - new Date(b.useBy));
+
+      container.innerHTML = items.map(item => {
+        const { status, label } = getStatus(item.useBy, false);
+        const quantityLine = item.quantity ? `<div class="item-quantity">${escapeHtml(item.quantity)}</div>` : '';
+        return `
+          <div class="item ${status}">
+            <div class="item-info">
+              <div class="item-name">${escapeHtml(item.name)}</div>
+              ${quantityLine}
+              <div class="item-location">${formatLocation(item.location)} • ${item.category}</div>
+              <div class="item-dates">Use by ${formatDate(item.useBy)}</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="item-status status-${status}">${label}</div>
+              <button class="item-delete" onclick="deleteItem(${item.id})">×</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function checkForExpiring() {
+      if (!('Notification' in window) || Notification.permission !== 'granted') {
+        return;
+      }
+
+      const items = getItems();
+      items.forEach(item => {
+        const { daysUntil } = getStatus(item.useBy, item.type === 'perishable');
+        const isExpiring = item.type === 'perishable' ? (daysUntil * 24 <= PERISHABLE_WARNING_HOURS) : (daysUntil <= STOCKPILE_WARNING_DAYS && daysUntil >= 0);
+        
+        if (isExpiring) {
+          const lastNotified = localStorage.getItem(`notified_${item.id}`);
+          const now = Date.now();
+          if (!lastNotified || (now - parseInt(lastNotified)) > 86400000) {
+            new Notification(`${item.name} expiring soon`, {
+              body: `Use by ${formatDate(item.useBy)}`,
+              tag: `expiry_${item.id}`
+            });
+            localStorage.setItem(`notified_${item.id}`, now.toString());
+          }
+        }
+      });
+    }
+
+    function exportData() {
+      const items = getItems();
+      const json = JSON.stringify(items, null, 2);
+      const textArea = document.createElement('textarea');
+      textArea.value = json;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Data copied to clipboard');
+    }
+
+    function showImportModal() {
+      document.getElementById('importModal').style.display = 'flex';
+    }
+
+    function closeImportModal() {
+      document.getElementById('importModal').style.display = 'none';
+      document.getElementById('importText').value = '';
+    }
+
+    function importData() {
+      const text = document.getElementById('importText').value.trim();
+      if (!text) {
+        alert('Please paste data to import');
+        return;
+      }
+
+      try {
+        const imported = JSON.parse(text);
+        if (!Array.isArray(imported)) {
+          alert('Invalid data format');
+          return;
+        }
+
+        const existing = getItems();
+        const merged = [...existing, ...imported];
+        setItems(merged);
+        renderAll();
+        closeImportModal();
+        alert('Data imported successfully');
+      } catch (e) {
+        alert('Error: Invalid data format');
+      }
+    }
+
+    function clearAllData() {
+      if (confirm('Delete all items? This cannot be undone.')) {
+        localStorage.removeItem(STORAGE_KEY);
+        renderAll();
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>
